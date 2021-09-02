@@ -1,7 +1,22 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+pub trait ScopeFn {
+    // simply `let` is a keyword.
+    fn let_move<F: FnOnce(Self) -> R, R>(self, f: F) -> R
+    where Self: Sized;
+    fn let_ref<F: FnOnce(&Self) -> R, R>(&self, f: F) -> R;
+    fn let_mut<F: FnOnce(&mut Self) -> R, R>(&mut self, f: F) -> R;
+    // cannot use `DerefMove`, using `Box`.
+    fn let_move_ptr<F: FnOnce(Box<Self>) -> R, R>(self: Box<Self>, f: F) -> R;
+}
+
+impl<T> ScopeFn for T {
+    fn let_move<F: FnOnce(Self) -> R, R>(self, f: F) -> R
+    where Self: Sized {
+        f(self)
     }
+
+    fn let_ref<F: FnOnce(&Self) -> R, R>(&self, f: F) -> R { f(self) }
+
+    fn let_mut<F: FnOnce(&mut Self) -> R, R>(&mut self, f: F) -> R { f(self) }
+
+    fn let_move_ptr<F: FnOnce(Box<Self>) -> R, R>(self: Box<Self>, f: F) -> R { f(self) }
 }

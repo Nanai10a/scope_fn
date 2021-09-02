@@ -10,6 +10,8 @@ pub trait ScopeFn {
     where Self: ::std::ops::Deref<Target = Target>;
     fn let_mut_ptr<F: FnOnce(&mut Target) -> R, R, Target>(&mut self, f: F) -> R
     where Self: ::std::ops::DerefMut<Target = Target>;
+
+    // TODO: cannot impl kotlin's `this`
 }
 
 impl<T> ScopeFn for T {
